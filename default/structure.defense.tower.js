@@ -7,6 +7,9 @@
  * mod.thing == 'a thing'; // true
  */
  
+ var tower = {};
+ 
+ 
 
 
     var tower = Game.getObjectById('21f25f236660c2f22cfe8972');

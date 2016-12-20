@@ -26,6 +26,12 @@ var roleBuilder = {
                 creep.moveTo(sources[0]);
             }
 	    }
+	},
+	
+	build: function(structureType) {
+	    var extensions = Game.spawns.Spawn1.room.find(FIND_MY_STRUCTURES, {
+    filter: { structureType: STRUCTURE_EXTENSION }
+});
 	}
 };
 

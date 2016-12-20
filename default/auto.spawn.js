@@ -29,7 +29,7 @@
            this.spawn(this.defaultBody, this.roles.upgrader);
         }
         
-         if(builders.length < 1) {
+         if(builders.length < 3) {
           this.spawn(this.defaultBody, this.roles.builder);
         }
    
