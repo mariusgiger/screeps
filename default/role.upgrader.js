@@ -1,8 +1,11 @@
+var roleBase = require('role.base');
 var roleUpgrader = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
 
+        roleBase.run(creep);
+  
         if(creep.memory.upgrading && creep.carry.energy == 0) {
             creep.memory.upgrading = false;
             creep.say('harvesting');

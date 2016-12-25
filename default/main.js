@@ -5,17 +5,18 @@ var autoSpawn = require('auto.spawn');
 var autoDefense = require('auto.defense');
 
 module.exports.loop = function () {
-autoSpawn.run();
-//autodefense.run();
-    for(var name in Game.creeps) {
+    
+    autoSpawn.run();
+    //autoDefense.run(Game.spawns["Spawn1"].room.name);
+    for (var name in Game.creeps) {
         var creep = Game.creeps[name];
-        if(creep.memory.role == 'harvester') {
+        if (creep.memory.role == 'harvester') {
             roleHarvester.run(creep);
         }
-        if(creep.memory.role == 'upgrader') {
+        if (creep.memory.role == 'upgrader') {
             roleUpgrader.run(creep);
         }
-        if(creep.memory.role == 'builder') {
+        if (creep.memory.role == 'builder') {
             roleBuilder.run(creep);
         }
     }
