@@ -6,27 +6,24 @@
  * var mod = require('structure.defense.tower');
  * mod.thing == 'a thing'; // true
  */
- 
- var tower = {};
- 
- 
 
+var towerDefense = {
+    run: function (tower) {
+        if (tower) {
+            var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+                filter: (structure) => structure.hits < structure.hitsMax
+            });
+            if (closestDamagedStructure) {
+                tower.repair(closestDamagedStructure);
+            }
 
-    var tower = Game.getObjectById('21f25f236660c2f22cfe8972');
-    if(tower) {
-        var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (structure) => structure.hits < structure.hitsMax
-        });
-        if(closestDamagedStructure) {
-            tower.repair(closestDamagedStructure);
-        }
-
-        var closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-        if(closestHostile) {
-            tower.attack(closestHostile);
+            var closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+            if (closestHostile) {
+                tower.attack(closestHostile);
+            }
         }
     }
-
-module.exports = {
-
 };
+
+
+module.exports = towerDefense;

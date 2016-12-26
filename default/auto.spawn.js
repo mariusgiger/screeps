@@ -60,17 +60,17 @@ var autoSpawn = {
             return;
         }
 
-        if (harvesters.length < 7 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
+        if (harvesters.length < 8 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
             this.spawn(this.determineBody(this.roles.harvester), this.roles.harvester);
             return;
         }
 
-        if (upgraders.length < 5 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
+        if (upgraders.length < 6 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
             this.spawn(this.defaultBody, this.roles.upgrader);
             return;
         }
 
-        if (builders.length < 4 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
+        if (builders.length < 6 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
             this.spawn(this.defaultBody, this.roles.builder);
             return;
         }
