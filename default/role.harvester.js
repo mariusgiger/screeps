@@ -26,11 +26,6 @@ var roleHarvester = {
                                 structure.structureType == STRUCTURE_SPAWN ||
                                 structure.structureType == STRUCTURE_TOWER ) && structure.energy < structure.energyCapacity;
                     }
-                    
-                    
-                
-                    
-        
             });
             
              
@@ -50,6 +45,8 @@ var roleHarvester = {
                          if(creep.transfer(containers[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(containers[0]);
                 }
+                 } else {
+                     creep.moveTo(22, 35);
                  }
             }
         }
