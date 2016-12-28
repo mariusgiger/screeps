@@ -14,45 +14,60 @@ var roleBuilder = {
             creep.say('building');
         }
         
-          var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
-         if (!targets.length) {
-            roleUpgrader.run(creep); 
+        if(creep.memory.currentTicks > 30) {
+            creep.memory.noSites = false;
+            creep.memory.currentTicks = 0;
+        }
+        
+        if(creep.memory.noSites) {
+            roleUpgrader.run(creep);
             return;
-         }
-        
-        
+        }
+
+        if (creep.memory.constructionSiteId === undefined) { //only gets executed on init
+            var constructionSites = this.findConstructionSites(creep);
+
+            if (!constructionSites.length) {
+                console.log("no construction sites found");
+                creep.memory.noSites = true;
+                roleUpgrader.run(creep);
+                return;
+            }
+
+            creep.memory.constructionSiteId = constructionSites[0].id;
+        }
+
+        var constructionSite = Game.getObjectById(creep.memory.constructionSiteId);
+
+        if (!constructionSite.progress) {
+            console.log("builder needs new target");
+            var constructionSites = this.findConstructionSites(creep);
+
+            if (!constructionSites.length) {
+                console.log("no construction sites found");
+                creep.memory.noSites = true;
+                roleUpgrader.run(creep);
+                return;
+            }
+
+            creep.memory.constructionSiteId = constructionSites[0].id;
+            constructionSite = constructionSites[0];
+        }
+
 
         if (creep.memory.building) {
-     
-                if (creep.build(targets[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets[0]);
-                }
-                
-        }
-        else {
-            var containers = creep.room.find(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_CONTAINER) && structure.store[RESOURCE_ENERGY] > 0;
-                }
-            });
 
-            if (!containers.length) {
-               /* var sources = creep.room.find(FIND_SOURCES);
-                if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(sources[0]);
-                }*/
-            } else {
-                if (creep.withdraw(containers[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(containers[0]);
-                }
+            if (creep.build(constructionSite) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(constructionSite);
             }
         }
+        else {
+            roleBase.getEnergyFromContainers(creep);
+        }
     },
-
-    build: function (structureType) {
-        var extensions = Game.spawns.Spawn1.room.find(FIND_MY_STRUCTURES, {
-            filter: { structureType: STRUCTURE_EXTENSION }
-        });
+    findConstructionSites: function (creep) {
+        var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
+        return targets;
     }
 };
 

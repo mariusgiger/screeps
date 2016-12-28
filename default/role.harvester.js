@@ -14,6 +14,12 @@ var roleHarvester = {
             creep.memory.delivering = true;
             creep.say('delivering');
         }
+        
+        if(creep.memory.currentTicks > 30) { //reset
+            creep.memory.sourceId = undefined;
+            creep.memory.deliverTargetId = undefined;
+            creep.memory.currentTicks = 0;
+        }
 
         if (creep.memory.delivering) { // delivering
             this.deliver(creep);

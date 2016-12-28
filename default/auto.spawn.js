@@ -76,7 +76,7 @@ var autoSpawn = {
             return;
         }
 
-        if (upgraders.length < 4 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
+        if (upgraders.length < 2 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
             this.spawn(this.defaultBody, this.roles.upgrader);
             return;
         }

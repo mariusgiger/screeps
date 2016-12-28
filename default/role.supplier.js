@@ -38,8 +38,8 @@ var roleSupplier = {
 
                 var supplyTargets = this.findSupplyTargets(creep);
 
-                if (!sources.length) {
-                    console.log("no source with energy found");
+                if (!supplyTargets.length) {
+                    console.log("no supply target found");
                     roleUpgrader.run(creep);
                     return;
                 }

@@ -10,6 +10,12 @@
 
 var roleBase = {
     run: function (creep) {
+        
+        if(creep.memory.currentTicks === undefined){
+            creep.memory.currentTicks = 0;
+        }
+        
+        creep.memory.currentTicks = creep.memory.currentTicks + 1;
         var repairTargets = creep.pos.findInRange(FIND_STRUCTURES, 1, {
             filter: function (object) {
                 return object.hits < object.hitsMax
