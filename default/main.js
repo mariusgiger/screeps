@@ -8,24 +8,34 @@ var autoDefense = require('auto.defense');
 
 module.exports.loop = function () {
     
+    autoDefense.run(Game.spawns["Spawn1"].room.name);
     autoSpawn.run();
-    //autoDefense.run(Game.spawns["Spawn1"].room.name);
     for (var name in Game.creeps) {
         var creep = Game.creeps[name];
         if (creep.memory.role == 'harvester') {
             roleHarvester.run(creep);
         }
+         if (creep.memory.role == 'supplier') {
+            roleSupplier.run(creep);
+        }
+        
+       
+        
         if (creep.memory.role == 'upgrader') {
             roleUpgrader.run(creep);
         }
+        
+         if (creep.memory.role == 'repairer') {
+            roleRepairer.run(creep);
+        }
+        
+       /*  if(autoSpawn.getEnergyAvailable(Game.spawns['Spawn1'].room) < 400) {
+            continue;
+        }*/
         if (creep.memory.role == 'builder') {
             roleBuilder.run(creep);
         }
-        if (creep.memory.role == 'supplier') {
-            roleSupplier.run(creep);
-        }
-        if (creep.memory.role == 'repairer') {
-            roleRepairer.run(creep);
-        }
+       
+       
     }
 }

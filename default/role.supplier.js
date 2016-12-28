@@ -1,4 +1,5 @@
 var roleBase = require('role.base');
+var roleUpgrader = require('role.upgrader');
 
 /*
  * Module code goes here. Use 'module.exports' to export things:
@@ -41,7 +42,8 @@ var roleSupplier = {
                     creep.moveTo(targets[0]);
                 }
             } else {
-                roleBase.moveOutOfWay(creep);
+                roleUpgrader.run(creep);
+                //roleBase.moveOutOfWay(creep);
             }
         } else {
             roleBase.getEnergyFromContainers(creep);

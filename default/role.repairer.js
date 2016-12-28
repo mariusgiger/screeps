@@ -21,9 +21,10 @@ var roleRepairer = {
 
         if (!creep.memory.repairing && creep.carry.energy == creep.carryCapacity) {
             creep.memory.repairing = true;
-            creep.say('repairing');
+            creep.say('repairer repairing');
         }
 
+console.log("repairing");
         // delivering
         if (creep.memory.repairing) {
            
@@ -36,9 +37,12 @@ var roleRepairer = {
             });
             
         repairTargets.sort(function (a, b) { return (a.hits - b.hits) });
+        //console.log("repairtargets" + repairTargets.length);
         if (repairTargets.length > 0)
         {
-            creep.repair(repairTargets[0]);
+            if(creep.repair(repairTargets[0]) === ERR_NOT_IN_RANGE) {
+                creep.moveTo(repairTargets[0]);
+            }
             //creep.say("repairing");
         } else {
                 roleBase.moveOutOfWay(creep);

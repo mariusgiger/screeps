@@ -9,6 +9,7 @@
 
 var autoSpawn = {
     defaultBody: [WORK, CARRY, MOVE],
+    maxSpawnEnergyThreshhold: 600,
     bodies: [
         {
             type: WORK,
@@ -45,7 +46,9 @@ var autoSpawn = {
     roles: {
         builder: "builder",
         harvester: "harvester",
-        upgrader: "upgrader"
+        upgrader: "upgrader",
+        repairer: "repairer",
+        supplier: "supplier"
     },
     run: function () {
         this.garbageCollector();
@@ -54,24 +57,39 @@ var autoSpawn = {
         var builders = _.filter(Game.creeps, (creep) => creep.memory.role == this.roles.builder);
         var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.roles.upgrader);
         
-        console.log("currently there are. harvesters: " + harvesters.length + ", upgraders: " + upgraders.length + ", builders: " + builders.length);
+        var suppliers = _.filter(Game.creeps, (creep) => creep.memory.role == this.roles.supplier);
+        var repairers = _.filter(Game.creeps, (creep) => creep.memory.role == this.roles.repairer);
+        
+        
+        console.log("currently there are. harvesters: " + harvesters.length + ", upgraders: " + upgraders.length + ", builders: " + builders.length +", suppliers: "+suppliers.length + " , repairers: "+repairers.length);
         
         if (this.currentlySpawning()) {
             return;
         }
 
-        if (harvesters.length < 8 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
+        if (harvesters.length < 7 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
             this.spawn(this.determineBody(this.roles.harvester), this.roles.harvester);
             return;
         }
+              if (suppliers.length < 4 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
+            this.spawn(this.defaultBody, this.roles.supplier);
+            return;
+        }
 
-        if (upgraders.length < 6 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
+        if (upgraders.length < 4 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
             this.spawn(this.defaultBody, this.roles.upgrader);
             return;
         }
 
-        if (builders.length < 6 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
+        if (builders.length < 4 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
             this.spawn(this.defaultBody, this.roles.builder);
+            return;
+        }
+        
+   
+        
+         if (repairers.length < 2 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
+            this.spawn(this.defaultBody, this.roles.repairer);
             return;
         }
 
@@ -146,8 +164,8 @@ var autoSpawn = {
                 return body;
                 break;
             case "upgrader":
-                
                 //spend half on work parts
+                //return this.defaultBody;
                     var workBoundary = remainingEnergy * 0.5 + 100;
                     for(var i = remainingEnergy; i > workBoundary; i = i - 100) {
                           body.push(WORK);
@@ -194,6 +212,8 @@ var autoSpawn = {
                     console.log("Determined the following body for role harvester: " + body);
                    return body;
                 break;
+             default:
+                    return this.defaultBody;
         }
     }
 };

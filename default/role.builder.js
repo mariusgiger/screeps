@@ -1,5 +1,5 @@
 var roleBase = require('role.base');
-var roleHarvester = require('role.harvester');
+var roleUpgrader = require('role.upgrader');
 var roleBuilder = {
 
     /** @param {Creep} creep **/
@@ -16,7 +16,7 @@ var roleBuilder = {
         
           var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
          if (!targets.length) {
-            roleHarvester.run(creep); 
+            roleUpgrader.run(creep); 
             return;
          }
         

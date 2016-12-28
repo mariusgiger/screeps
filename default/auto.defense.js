@@ -9,7 +9,7 @@
 
 var defense = {
     run: function (roomName) {
-
+        //TODO auto activate save mode
         var hostiles = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS);
 
         if (hostiles.length > 0) {
