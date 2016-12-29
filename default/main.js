@@ -23,6 +23,15 @@ module.exports.loop = function () {
         if (creep.memory.role == 'supplier') {
             roleSupplier.run(creep);
         }
+        
+          if (creep.memory.role == 'builder') {
+            roleBuilder.run(creep);
+        }
+        
+             /*   if(autoSpawn.getEnergyAvailable(Game.spawns['Spawn1'].room) < 400) {
+             continue;
+         }
+*/
 
 
         if (creep.memory.role == 'upgrader') {
@@ -33,13 +42,7 @@ module.exports.loop = function () {
             roleRepairer.run(creep);
         }
 
-        /*  if(autoSpawn.getEnergyAvailable(Game.spawns['Spawn1'].room) < 400) {
-             continue;
-         }*/
-
-        if (creep.memory.role == 'builder') {
-            roleBuilder.run(creep);
-        }
+      
 
 
     }

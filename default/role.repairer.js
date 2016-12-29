@@ -13,6 +13,11 @@ var roleRepairer = {
             creep.memory.repairing = true;
             creep.say('repairing');
         }
+        
+         if(creep.memory.currentTicks > 200) { //reset
+            creep.memory.repairTargetId = undefined;
+            creep.memory.currentTicks = 0;
+        }
 
         if (creep.memory.repairing) { //repairing
 

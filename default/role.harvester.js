@@ -1,4 +1,5 @@
 var roleBase = require('role.base');
+var autoSpawn = require('auto.spawn');
 var roleHarvester = {
 
     /** @param {Creep} creep **/
@@ -15,7 +16,7 @@ var roleHarvester = {
             creep.say('delivering');
         }
         
-        if(creep.memory.currentTicks > 30) { //reset
+        if(creep.memory.currentTicks > 150) { //reset
             creep.memory.sourceId = undefined;
             creep.memory.deliverTargetId = undefined;
             creep.memory.currentTicks = 0;
@@ -37,15 +38,16 @@ var roleHarvester = {
 
         return sources;
     },
-    findDeliverTargets: function (creep) {
-        var containers = creep.room.find(FIND_STRUCTURES, {
+    findDeliverTarget: function (creep) {
+        var container = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: (structure) => {
-                return (structure.structureType == STRUCTURE_CONTAINER && structure.store[RESOURCE_ENERGY] < structure.storeCapacity);
+                return (structure.structureType == STRUCTURE_CONTAINER ||
+                structure.structureType == STRUCTURE_STORAGE) && structure.store[RESOURCE_ENERGY] < structure.storeCapacity;
             }
         });
 
-        if (containers.length) {
-            return containers;
+        if (container) {
+            return container;
         }
 
         var targets = creep.room.find(FIND_STRUCTURES, {
@@ -56,7 +58,7 @@ var roleHarvester = {
             }
         });
 
-        return targets;
+        return targets ? targets[0] : null;
     },
     isFull: function(structure) {
         switch(structure.structureType) {
@@ -102,30 +104,30 @@ var roleHarvester = {
     },
     deliver: function (creep) {
         if (creep.memory.deliverTargetId === undefined) { //only gets executed on init
-            var deliverTargets = this.findDeliverTargets(creep);
+            var deliverTarget = this.findDeliverTarget(creep);
 
-            if (!deliverTargets.length) {
+            if (!deliverTarget) {
                 console.log("no deliver targets found");
                 roleBase.moveOutOfWay(creep);
                 return;
             }
 
-            creep.memory.deliverTargetId = deliverTargets[0].id;
+            creep.memory.deliverTargetId = deliverTarget.id;
         }
 
         var deliverTarget = Game.getObjectById(creep.memory.deliverTargetId);
         if(this.isFull(deliverTarget)) {
             console.log("harvester "+creep.name+" needs new deliver target");
-            var deliverTargets = this.findDeliverTargets(creep);
+            var deliverTarget = this.findDeliverTarget(creep);
 
-            if (!deliverTargets.length) {
+            if (!deliverTarget) {
                 console.log("no deliver targets found");
                 roleBase.moveOutOfWay(creep);
                 return;
             }
 
-            creep.memory.deliverTargetId = deliverTargets[0].id;
-            deliverTarget = deliverTargets[0];
+            creep.memory.deliverTargetId = deliverTarget.id;
+            deliverTarget = deliverTarget;
         }
 
         if (creep.transfer(deliverTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {

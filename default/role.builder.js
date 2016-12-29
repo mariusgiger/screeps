@@ -1,5 +1,5 @@
 var roleBase = require('role.base');
-var roleUpgrader = require('role.upgrader');
+var roleUpgrader = require('role.harvester'); //TODO change back to upgrader
 var roleBuilder = {
 
     /** @param {Creep} creep **/
@@ -39,7 +39,7 @@ var roleBuilder = {
 
         var constructionSite = Game.getObjectById(creep.memory.constructionSiteId);
 
-        if (!constructionSite.progress) {
+        if (!constructionSite) {
             console.log("builder needs new target");
             var constructionSites = this.findConstructionSites(creep);
 

@@ -15,6 +15,9 @@ var roleSupplier = {
             creep.memory.supplying = true;
             creep.say('delivering');
         }
+        
+        //TODO
+        creep.memory.currentPath = undefined;
 
         // delivering
         if (creep.memory.supplying) {
@@ -49,11 +52,40 @@ var roleSupplier = {
             }
 
             if (creep.transfer(supplyTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(supplyTarget);
+                
+                if(!creep.memory.currentPath) {
+                      var path = creep.pos.findPathTo(supplyTarget);
+                      console.log(path);
+                      creep.memory.currentPath = path;
+                }
+                
+                creep.moveByPath(creep.memory.currentPath);
+            } else {
+                creep.memory.path = undefined;
             }
 
         } else {
-            roleBase.getEnergyFromContainers(creep);
+            
+             var containers = creep.room.find(FIND_STRUCTURES, {
+            filter: (structure) => {
+                return (structure.structureType == STRUCTURE_CONTAINER ||
+                structure.structureType == STRUCTURE_STORAGE) && structure.store[RESOURCE_ENERGY] > 0;
+            }
+        });
+
+        if (containers.length) {
+            if (creep.withdraw(containers[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                  if(!creep.memory.currentPath) {
+                      var path = creep.pos.findPathTo(containers[0]);
+                      console.log(path);
+                      creep.memory.currentPath = path;
+                }
+                
+                creep.moveByPath(creep.memory.currentPath);
+            } else {
+                creep.memory.path = undefined;
+            }
+        }
         }
     },
     findSupplyTargets: function (creep) {
