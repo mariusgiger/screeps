@@ -1,117 +1,83 @@
-/*
- * Module code goes here. Use 'module.exports' to export things:
- * module.exports.thing = 'a thing';
- *
- * You can import it from another modules like this:
- * var mod = require('auto.spawn');
- * mod.thing == 'a thing'; // true
- */
-
-var autoSpawn = {
-    defaultBody: [WORK, CARRY, MOVE],
-    maxSpawnEnergyThreshhold: 600,
-    bodies: [
-        {
-            type: WORK,
-            cost: 100
-        },
-        {
-            type: MOVE,
-            cost: 50
-        }, {
-            type: CARRY,
-            cost: 50
-        }, 
-        {
-            type: ATTACK,
-            cost: 80
-        },
-        {
-            type: RANGED_ATTACK,
-            cost: 150
-        },
-        {
-            type: HEAL,
-            cost: 250
-        },
-        {
-            type: CLAIM,
-            cost: 600
-        }, 
-        {
-            type: TOUGH,
-            cost: 10
-        }],
-
-    roles: {
+var stats = require("stats");
+var spawn = (function() {
+    var defaultBody = [WORK, CARRY, MOVE];
+    var maxSpawnEnergyThreshhold = 600;
+    var currentSpawn = "Spawn1";
+    var roles = {
         builder: "builder",
         harvester: "harvester",
         upgrader: "upgrader",
         repairer: "repairer",
         supplier: "supplier"
-    },
-    run: function () {
-        this.garbageCollector();
+    };
+    
+    function run() {
+        garbageCollector();
         
-        var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == this.roles.harvester);
-        var builders = _.filter(Game.creeps, (creep) => creep.memory.role == this.roles.builder);
-        var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.roles.upgrader);
+        var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == roles.harvester);
+        var builders = _.filter(Game.creeps, (creep) => creep.memory.role == roles.builder);
+        var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == roles.upgrader);
+        var suppliers = _.filter(Game.creeps, (creep) => creep.memory.role == roles.supplier);
+        var repairers = _.filter(Game.creeps, (creep) => creep.memory.role == roles.repairer);
         
-        var suppliers = _.filter(Game.creeps, (creep) => creep.memory.role == this.roles.supplier);
-        var repairers = _.filter(Game.creeps, (creep) => creep.memory.role == this.roles.repairer);
+        stats.info("currently there are. harvesters: " + harvesters.length + ", upgraders: " + upgraders.length + ", builders: " + builders.length +", suppliers: "+suppliers.length + " , repairers: "+repairers.length);
         
-        
-        console.log("currently there are. harvesters: " + harvesters.length + ", upgraders: " + upgraders.length + ", builders: " + builders.length +", suppliers: "+suppliers.length + " , repairers: "+repairers.length);
-        
-        if (this.currentlySpawning()) {
+        if (currentlySpawning()) {
             return;
         }
 
-        if (harvesters.length < 6 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
-            this.spawn(this.determineBody(this.roles.harvester), this.roles.harvester);
-            return;
-        }
-              if (suppliers.length < 3 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
-            this.spawn(this.defaultBody, this.roles.supplier);
-            return;
-        }
-
-        if (upgraders.length < 2 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
-            this.spawn(this.defaultBody, this.roles.upgrader);
-            return;
-        }
-
-        if (builders.length < 2 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
-            this.spawn(this.defaultBody, this.roles.builder);
+        if (harvesters.length < 6 && Game.spawns['Spawn1'].canCreateCreep(defaultBody) === 0) {
+            Memory.creepNr = Memory.creepNr || -1;
+            Memory.creepNr = Memory.creepNr + 1;
+            
+            spawn(determineBody(roles.harvester), {
+                role: roles.harvester,
+                creepNr: Memory.creepNr % 5
+                });
             return;
         }
         
-   
-        
-         if (repairers.length < 2 && Game.spawns['Spawn1'].canCreateCreep(this.defaultBody) === 0) {
-            this.spawn(this.defaultBody, this.roles.repairer);
+        if (suppliers.length < 3 && Game.spawns['Spawn1'].canCreateCreep(defaultBody) === 0) {
+            spawn(defaultBody, { role: roles.supplier });
             return;
         }
 
-    },
-    garbageCollector: function () {
+        if (upgraders.length < 2 && Game.spawns['Spawn1'].canCreateCreep(defaultBody) === 0) {
+            spawn(defaultBody, { role: roles.upgrader });
+            return;
+        }
+
+        if (builders.length < 2 && Game.spawns['Spawn1'].canCreateCreep(defaultBody) === 0) {
+            spawn(defaultBody, {role: roles.builder});
+            return;
+        }
+
+        if (repairers.length < 2 && Game.spawns['Spawn1'].canCreateCreep(defaultBody) === 0) {
+            spawn(defaultBody, roles.repairer);
+            return;
+        }
+    }
+    
+    function garbageCollector() {
         for (var name in Memory.creeps) {
             if (!Game.creeps[name]) {
                 delete Memory.creeps[name];
-                console.log('Clearing non-existing creep memory:', name);
+                stats.debug('Clearing non-existing creep memory:' + name);
             }
         }
-
-    },
-    spawn: function (creepBody, role) {
-        if (Game.spawns['Spawn1'].canCreateCreep(creepBody) === 0) {
-            var newName = Game.spawns['Spawn1'].createCreep(creepBody, undefined, { role: role });
-            console.log('Spawning new ' + role + ': ' + newName);
+    }
+    
+    function spawn(creepBody, opts) {
+        if (Game.spawns[currentSpawn].canCreateCreep(creepBody) === OK) {
+            var newName = Game.spawns[currentSpawn].createCreep(creepBody, undefined, opts);
+            stats.debug('Spawning new ' + opts.role + ': ' + newName);
+            return newName;
         } else {
-            //console.log("Could not create creep! "+ creepBody)
+            return null;
         }
-    },
-    getEnergyAvailable: function (room) {
+    }
+    
+    function getEnergyAvailable(room) {
         var targets = room.find(FIND_STRUCTURES, {
             filter: (structure) => {
                 return (structure.structureType == STRUCTURE_EXTENSION ||
@@ -126,29 +92,30 @@ var autoSpawn = {
 
         //console.log("Total energy for spawning creeps " + totalEnergy);
         return totalEnergy;
-    },
-    currentlySpawning: function() {
-        return Game.spawns['Spawn1'].spawning != null;
-    },
-    determineBody: function(role){
-        
-    var energy = this.getEnergyAvailable(Game.spawns['Spawn1'].room);   
-    console.log(energy)
-    var remainingEnergy = energy - 200;
-    var body = [WORK, CARRY, MOVE];
-    //TODO determine max amount to spend for role
+    }
+    
+    function currentlySpawning() {
+        return Game.spawns[currentSpawn].spawning != null;
+    }
+    
+    function determineBody (role) {
+        var energy = getEnergyAvailable(Game.spawns['Spawn1'].room);   
+        var remainingEnergy = energy - 200;
+        remainingEnergy = remainingEnergy < maxSpawnEnergyThreshhold ? remainingEnergy : maxSpawnEnergyThreshhold;
+        console.log("remaining energy for creep" + remainingEnergy);
+        var body = [WORK, CARRY, MOVE];
+        //TODO determine max amount to spend for role
         switch(role) {
             case "harvester": 
-                
                     //spend half on work parts
-                    var workBoundary = remainingEnergy * 0.3 + 100;
+                    var workBoundary = remainingEnergy * 0.4 + 100;
                     for(var i = remainingEnergy; i > workBoundary; i = i - 100) {
                           body.push(WORK);
                           remainingEnergy = remainingEnergy - 100;
                     }
                     
                      //spend quarter on move parts
-                    var moveBoundary = remainingEnergy * 0.5 + 50;
+                    var moveBoundary = remainingEnergy * 0.4 + 50;
                     for(var i = remainingEnergy; i > moveBoundary; i = i - 50) {
                           body.push(MOVE);
                           remainingEnergy = remainingEnergy - 50;
@@ -161,63 +128,18 @@ var autoSpawn = {
                     }
                     
                     console.log("Determined the following body for role harvester: " + body);
-                return body;
-                break;
-            case "upgrader":
-                //spend half on work parts
-                //return this.defaultBody;
-                    var workBoundary = remainingEnergy * 0.5 + 100;
-                    for(var i = remainingEnergy; i > workBoundary; i = i - 100) {
-                          body.push(WORK);
-                          remainingEnergy = remainingEnergy - 100;
-                    }
-                    
-                     //spend quarter on carry parts
-                    var moveBoundary = remainingEnergy * 0.5 + 50;
-                    for(var i = remainingEnergy; i > moveBoundary; i = i - 50) {
-                          body.push(MOVE);
-                          remainingEnergy = remainingEnergy - 50;
-                    }
-                    
-                      //spend rest on carry parts
-                    for(var i = remainingEnergy; i >= 50; i = i - 50) {
-                          body.push(CARRY);
-                          remainingEnergy = remainingEnergy - 50;
-                    }
-                    
-                    console.log("Determined the following body for role harvester: " + body);
-                   return body;
-                break;
-            case "builder":
-                //spend half on work parts
-                    var workBoundary = remainingEnergy * 0.5 + 100;
-                    for(var i = remainingEnergy; i > workBoundary; i = i - 100) {
-                          body.push(WORK);
-                          remainingEnergy = remainingEnergy - 100;
-                    }
-                    
-                     //spend quarter on move parts
-                    var moveBoundary = remainingEnergy * 0.5 + 50;
-                    for(var i = remainingEnergy; i > moveBoundary; i = i - 50) {
-                          body.push(MOVE);
-                          remainingEnergy = remainingEnergy - 50;
-                    }
-                    
-                      //spend rest on carry parts
-                    for(var i = remainingEnergy; i >= 50; i = i - 50) {
-                          body.push(CARRY);
-                          remainingEnergy = remainingEnergy - 50;
-                    }
-                    
-                    console.log("Determined the following body for role harvester: " + body);
-                   return body;
-                break;
-             default:
-                    return this.defaultBody;
         }
+        
+        return body;
     }
-};
+    
+   return {
+       run: run,
+       getEnergyAvailable: getEnergyAvailable
+   };
+    
+})();
 
-module.exports = autoSpawn;
+module.exports = spawn;
 
 

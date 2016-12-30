@@ -1,5 +1,5 @@
 var roleBase = require('role.base');
-var roleUpgrader = require('role.harvester'); //TODO change back to upgrader
+var roleUpgrader = require('role.upgrader');
 var roleBuilder = {
 
     /** @param {Creep} creep **/

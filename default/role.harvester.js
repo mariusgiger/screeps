@@ -35,7 +35,13 @@ var roleHarvester = {
                 return source.energy > 0;
             }
         });
-
+        
+        if(sources && sources.length > 1) {
+            if(creep.memory.creepNr && creep.memory.creepNr > 4) {
+                return [sources[1]];
+            }
+        }
+        
         return sources;
     },
     findDeliverTarget: function (creep) {
@@ -84,7 +90,7 @@ var roleHarvester = {
 
         var source = Game.getObjectById(creep.memory.sourceId);
 
-        if (source.energy === 0) {
+        if (!source || source.energy === 0) {
             console.log("harvester "+creep.name+ " needs new source");
             var sources = this.findSources(creep);
 

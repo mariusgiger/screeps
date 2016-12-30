@@ -5,14 +5,12 @@ var roleSupplier = require('role.supplier');
 var roleRepairer = require('role.repairer');
 var autoSpawn = require('auto.spawn');
 var autoDefense = require('auto.defense');
-
+var stats = require("stats");
 module.exports.loop = function () {
 
     autoDefense.run(Game.spawns["Spawn1"].room.name);
-    console.log("cpu before def" + Game.cpu.getUsed());
     autoSpawn.run();
-            
-        console.log("cpu before roles" + Game.cpu.getUsed());
+    //console.log("cpu before roles" + Game.cpu.getUsed());
     for (var name in Game.creeps) {
         var creep = Game.creeps[name];
 
@@ -41,11 +39,5 @@ module.exports.loop = function () {
         if (creep.memory.role == 'repairer') {
             roleRepairer.run(creep);
         }
-
-      
-
-
     }
-    
-     console.log("cpu after roles" + Game.cpu.getUsed());
 }

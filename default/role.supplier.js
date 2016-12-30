@@ -55,7 +55,6 @@ var roleSupplier = {
                 
                 if(!creep.memory.currentPath) {
                       var path = creep.pos.findPathTo(supplyTarget);
-                      console.log(path);
                       creep.memory.currentPath = path;
                 }
                 
@@ -77,7 +76,6 @@ var roleSupplier = {
             if (creep.withdraw(containers[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                   if(!creep.memory.currentPath) {
                       var path = creep.pos.findPathTo(containers[0]);
-                      console.log(path);
                       creep.memory.currentPath = path;
                 }
                 
