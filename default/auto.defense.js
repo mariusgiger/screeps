@@ -1,14 +1,5 @@
-/*
- * Module code goes here. Use 'module.exports' to export things:
- * module.exports.thing = 'a thing';
- *
- * You can import it from another modules like this:
- * var mod = require('auto.defense');
- * mod.thing == 'a thing'; // true
- */
-
-var defense = {
-    run: function (roomName) {
+var autoDefense = (function() {
+    function run(roomName) {
         Memory.myTowers =  Memory.myTowers || {};
         //TODO auto activate save mode
         var hostiles = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS);
@@ -28,12 +19,12 @@ var defense = {
             Game.notify(`User ${username} spotted in room ${roomName} with ${hostiles.length} creeps at pos ${hostiles[0].pos.x} , ${hostiles[0].pos.y}. Creeps with attack body parts: ${hostilesWithAttackParts.length}`);
             towers.forEach(tower => tower.attack(hostiles[0]));
         } else { //repair
-          //  towers.forEach(tower => this.repair(tower));
-        }
-    }, 
-    repair: function(tower) {
-        
-        if(tower.energy < tower.energyCapacity * 0.5) {
+          //  towers.forEach(tower => repair(tower));
+        } 
+    }
+    
+    function repair(tower) {
+         if(tower.energy < tower.energyCapacity * 0.5) {
             return;
         }
         
@@ -67,19 +58,25 @@ var defense = {
                 repairTarget = repairTarget;
             }
             
-           
-            tower.repair(repairTarget);
-    },
-    findDamagedStructures: function(tower) {
+        tower.repair(repairTarget);
+    }
+    
+    function findDamagedStructures(tower) {
         var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: (structure) => structure.hits < structure.hitsMax
             });
         
         return closestDamagedStructure;
-    },
-    garbageCollector: function() {
+    }
+    
+    function garbageCollector() {
         
     }
-};
+    
+    return {
+        run: run,
+        repair: repair
+    };
+})();
 
-module.exports = defense;
+module.exports = autoDefense;

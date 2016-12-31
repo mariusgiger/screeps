@@ -119,7 +119,7 @@ var spawn = (function() {
                 body = computeParts(remainingEnergy);
         }
         
-        console.log("Determined the following body for role "+role+" : " + body);
+        stats.info("Determined the following body for role "+role+" : " + body);
         return body;
     }
 
