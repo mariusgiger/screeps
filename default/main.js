@@ -7,7 +7,8 @@ var autoSpawn = require('auto.spawn');
 var autoDefense = require('auto.defense');
 var stats = require("stats");
 module.exports.loop = function () {
-
+    
+    console.log("######################## NEW TICK ##############################");
     autoDefense.run(Game.spawns["Spawn1"].room.name);
     autoSpawn.run();
     //console.log("cpu before roles" + Game.cpu.getUsed());

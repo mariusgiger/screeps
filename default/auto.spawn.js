@@ -1,7 +1,7 @@
 var stats = require("stats");
 var spawn = (function() {
     var defaultBody = [WORK, CARRY, MOVE];
-    var maxSpawnEnergyThreshhold = 600;
+    var maxSpawnEnergyThreshhold = 700;
     var currentSpawn = "Spawn1";
     var roles = {
         builder: "builder",
@@ -51,9 +51,9 @@ var spawn = (function() {
             spawn(defaultBody, {role: roles.builder});
             return;
         }
-
+        
         if (repairers.length < 2 && Game.spawns['Spawn1'].canCreateCreep(defaultBody) === 0) {
-            spawn(defaultBody, roles.repairer);
+            spawn(defaultBody, {role: roles.repairer});
             return;
         }
     }
@@ -70,6 +70,7 @@ var spawn = (function() {
     function spawn(creepBody, opts) {
         if (Game.spawns[currentSpawn].canCreateCreep(creepBody) === OK) {
             var newName = Game.spawns[currentSpawn].createCreep(creepBody, undefined, opts);
+            console.log(opts.toString());
             stats.debug('Spawning new ' + opts.role + ': ' + newName);
             return newName;
         } else {
@@ -102,37 +103,58 @@ var spawn = (function() {
         var energy = getEnergyAvailable(Game.spawns['Spawn1'].room);   
         var remainingEnergy = energy - 200;
         remainingEnergy = remainingEnergy < maxSpawnEnergyThreshhold ? remainingEnergy : maxSpawnEnergyThreshhold;
-        console.log("remaining energy for creep" + remainingEnergy);
-        var body = [WORK, CARRY, MOVE];
-        //TODO determine max amount to spend for role
+        var body;
+        
         switch(role) {
-            case "harvester": 
-                    //spend half on work parts
-                    var workBoundary = remainingEnergy * 0.4 + 100;
-                    for(var i = remainingEnergy; i > workBoundary; i = i - 100) {
-                          body.push(WORK);
-                          remainingEnergy = remainingEnergy - 100;
-                    }
-                    
-                     //spend quarter on move parts
-                    var moveBoundary = remainingEnergy * 0.4 + 50;
-                    for(var i = remainingEnergy; i > moveBoundary; i = i - 50) {
-                          body.push(MOVE);
-                          remainingEnergy = remainingEnergy - 50;
-                    }
-                    
-                      //spend rest on carry parts
-                    for(var i = remainingEnergy; i >= 50; i = i - 50) {
-                          body.push(CARRY);
-                          remainingEnergy = remainingEnergy - 50;
-                    }
-                    
-                    console.log("Determined the following body for role harvester: " + body);
+            case role.harvester: 
+                body = computeParts(remainingEnergy, 0.5, 0.25, 0.25);
+                break;
+            case role.supplier:
+            case role.builder:
+            case role.repairer:
+            case role.upgrader:
+                body = computeParts(remainingEnergy, 0.25, 0.5, 0.25);
+                break;    
+            default:
+                body = computeParts(remainingEnergy);
+        }
+        
+        console.log("Determined the following body for role "+role+" : " + body);
+        return body;
+    }
+
+    function computeParts(energy, work, carry, move) {
+        var body = [];
+        
+        var max = work + carry + move;
+        if(!max || max < 0 || max > 1) {
+            stats.error("parts for creep could not be computed because the energy limit was exceeded");
+            return defaultBody;
+        }
+        
+        if(work) {
+            var boundary = energy - energy * work;
+            for(; energy > boundary; energy = energy - 100) {
+                body.push(WORK);
+            }
+        }
+        
+        if(carry) {
+            var boundary = energy - energy * carry;
+            for(; energy > boundary; energy = energy - 50) {
+                body.push(CARRY);
+            }
+        }
+        
+        if(move) {
+            var boundary = energy - energy * carry;
+            for(; energy > boundary; energy = energy - 50) {
+                body.push(MOVE);
+            }
         }
         
         return body;
     }
-    
    return {
        run: run,
        getEnergyAvailable: getEnergyAvailable

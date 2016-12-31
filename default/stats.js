@@ -21,10 +21,15 @@
         }
     }
     
+    function error(message) {
+        console.log("ERROR: "+message);
+    }
+    
     return {
         notify: notify,
         debug: debug,
-        info: info
+        info: info,
+        error: error
     }
  })();
 

@@ -23,15 +23,15 @@ var roleSupplier = {
         if (creep.memory.supplying) {
 
             if (creep.memory.supplyTargetId === undefined) { //only gets executed on init
-                var supplyTargets = this.findSupplyTargets(creep);
+                var supplyTarget = this.findSupplyTarget(creep);
 
-                if (!supplyTargets.length) {
+                if (!supplyTarget) {
                     console.log("no supply targets found");
                     roleUpgrader.run(creep);
                     return;
                 }
 
-                creep.memory.supplyTargetId = supplyTargets[0].id;
+                creep.memory.supplyTargetId = supplyTarget.id;
             }
 
             var supplyTarget = Game.getObjectById(creep.memory.supplyTargetId);
@@ -39,16 +39,16 @@ var roleSupplier = {
             if (supplyTarget.energy >= supplyTarget.energyCapacity) {
                 console.log("supplier " + creep.name + " needs new target");
 
-                var supplyTargets = this.findSupplyTargets(creep);
+                var newSupplyTarget = this.findSupplyTarget(creep);
 
-                if (!supplyTargets.length) {
+                if (!newSupplyTarget) {
                     console.log("no supply target found");
                     roleUpgrader.run(creep);
                     return;
                 }
 
-                creep.memory.supplyTargetId = supplyTargets[0].id;
-                supplyTarget = supplyTargets[0];
+                creep.memory.supplyTargetId = newSupplyTarget.id;
+                supplyTarget = newSupplyTarget;
             }
 
             if (creep.transfer(supplyTarget, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
@@ -86,16 +86,16 @@ var roleSupplier = {
         }
         }
     },
-    findSupplyTargets: function (creep) {
-        var targets = creep.room.find(FIND_STRUCTURES, {
+    findSupplyTarget: function (creep) {
+        var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
             filter: (structure) => {
                 return (structure.structureType == STRUCTURE_EXTENSION ||
                     structure.structureType == STRUCTURE_SPAWN ||
                     structure.structureType == STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
             }
         });
-
-        return targets;
+        
+        return target;
     }
 };
 module.exports = roleSupplier;

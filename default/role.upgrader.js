@@ -23,6 +23,14 @@ var roleUpgrader = {
         else {
             roleBase.getEnergyFromContainers(creep);
         }
+        
+        /*TODO pick up dropped items
+        var target = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY);
+if(target) {
+    if(creep.pickup(target) == ERR_NOT_IN_RANGE) {
+        creep.moveTo(target);
+    }
+}*/
     }
 };
 
