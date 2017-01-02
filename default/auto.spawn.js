@@ -103,28 +103,29 @@ var spawn = (function() {
         var energy = getEnergyAvailable(Game.spawns['Spawn1'].room);   
         var remainingEnergy = energy - 200;
         remainingEnergy = remainingEnergy < maxSpawnEnergyThreshhold ? remainingEnergy : maxSpawnEnergyThreshhold;
+        console.log("remeng"+ remainingEnergy);
         var body;
         
         switch(role) {
-            case role.harvester: 
+            case roles.harvester: 
                 body = computeParts(remainingEnergy, 0.5, 0.25, 0.25);
                 break;
-            case role.supplier:
-            case role.builder:
-            case role.repairer:
-            case role.upgrader:
+            case roles.supplier:
+            case roles.builder:
+            case roles.repairer:
+            case roles.upgrader:
                 body = computeParts(remainingEnergy, 0.25, 0.5, 0.25);
                 break;    
             default:
                 body = computeParts(remainingEnergy);
         }
         
-        stats.info("Determined the following body for role "+role+" : " + body);
+        console.log("Determined the following body for role "+role+" : " + body.toString());
         return body;
     }
-
+    
     function computeParts(energy, work, carry, move) {
-        var body = [];
+        var body = [WORK, CARRY, MOVE];
         
         var max = work + carry + move;
         if(!max || max < 0 || max > 1) {
